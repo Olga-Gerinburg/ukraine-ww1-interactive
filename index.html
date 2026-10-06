@@ -321,15 +321,38 @@
             const modal = document.getElementById('zoom-modal');
             const img = document.getElementById('zoom-img');
             const slider = document.getElementById('zoom-slider');
-            img.src = src; slider.value = 100; applyZoom(100);
+            img.src = src; 
+            slider.value = 100; 
+            applyZoom(100);
             modal.classList.remove('hidden');
         }
-        function toggleModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function toggleModal(id) { 
+            document.getElementById(id).classList.add('hidden'); 
+        }
+
         function applyZoom(val) {
             document.getElementById('zoom-percent').textContent = val + '%';
             const img = document.getElementById('zoom-img');
-            if (val == 100) { img.style.width = '100%'; img.style.height = '100%'; img.classList.add('object-contain'); }
-            else { img.style.width = val + '%'; img.style.height = 'auto'; img.classList.remove('object-contain'); }
+            const container = img.parentElement; // Отримуємо контейнер картинки
+
+            if (val == 100) { 
+                img.style.width = '100%'; 
+                img.style.height = '100%'; 
+                img.classList.add('object-contain'); 
+                
+                // Повертаємо центрування для стандартного розміру
+                container.classList.add('justify-center', 'items-center');
+                container.classList.remove('justify-start', 'items-start');
+            } else { 
+                img.style.width = val + '%'; 
+                img.style.height = 'auto'; 
+                img.classList.remove('object-contain'); 
+                
+                // Вимикаємо центрування, притискаємо до лівого верхнього краю для правильного скролу
+                container.classList.remove('justify-center', 'items-center');
+                container.classList.add('justify-start', 'items-start');
+            }
         }
 
         function drawLine(svgId, id1, id2, color) {
