@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="uk" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Україна в роки Першої світової війни</title>
+    <link rel="icon" type="image/jpeg" href="trizub.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#243B53', secondary: '#6F9FB5', paper: '#F3EBDD', accent: '#8C3F4D', cardbg: '#FFFDF8', muted: '#536471' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F3EBDD; color: #243B53; font-family: system-ui, -apple-system, sans-serif; }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .map-marker { transition: all 0.2s ease; cursor: pointer; }
+        .map-marker:hover { transform: scale(1.3); }
+        .marker-selected { outline: 4px solid #8C3F4D; transform: scale(1.35); z-index: 50; }
+        .no-pointer-events { pointer-events: none; }
+        .zoom-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+        .zoom-scroll::-webkit-scrollbar-track { background: #222; }
+        .zoom-scroll::-webkit-scrollbar-thumb { background: #666; border-radius: 5px; }
+        .zoom-scroll::-webkit-scrollbar-thumb:hover { background: #888; }
+        svg.connections { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
+        
+        .arrow-down {
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #6F9FB5;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col justify-between selection:bg-secondary selection:text-white">
+
+    <!-- Шапка (Фіксована, z-[60]) -->
+    <header class="bg-primary text-paper shadow-md sticky top-0 z-[60] h-[104px]">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <h1 class="text-xl md:text-2xl font-bold tracking-wide">Україна в роки Першої світової війни</h1>
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="toggleFullScreen()" class="bg-secondary hover:bg-opacity-80 text-white px-3 py-1.5 rounded text-sm transition flex items-center gap-1 shadow cursor-pointer"><span>⛶</span> На весь екран</button>
+                <button type="button" onclick="clearAllData()" class="bg-accent hover:bg-opacity-80 text-white px-3 py-1.5 rounded text-sm transition flex items-center gap-1 shadow cursor-pointer"><span>🗑️️</span> Очистити відповіді</button>
+            </div>
+        </div>
+        <nav class="bg-[#1b2d42] border-t border-[#334e68] px-4 py-2 overflow-x-auto">
+            <div class="max-w-7xl mx-auto flex gap-2 min-w-max">
+                <button type="button" onclick="switchTab(1)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-secondary text-white cursor-pointer" data-tab="1">Території</button>
+                <button type="button" onclick="switchTab(2)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-primary text-paper hover:bg-secondary cursor-pointer" data-tab="2">Битви</button>
+                <button type="button" onclick="switchTab(3)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-primary text-paper hover:bg-secondary cursor-pointer" data-tab="3">Фронт</button>
+                <button type="button" onclick="switchTab(41)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-primary text-paper hover:bg-secondary cursor-pointer" data-tab="41">Організації</button>
+                <button type="button" onclick="switchTab(42)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-primary text-paper hover:bg-secondary cursor-pointer" data-tab="42">Постаті</button>
+                <button type="button" onclick="switchTab(5)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-primary text-paper hover:bg-secondary cursor-pointer" data-tab="5">УСС</button>
+                <button type="button" onclick="switchTab(6)" class="tab-btn px-3 py-1.5 rounded text-sm font-medium transition bg-primary text-paper hover:bg-secondary cursor-pointer" data-tab="6">Тести</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full relative">
+
+        <!-- БЛОК 1 -->
+        <section id="block-1" class="tab-content space-y-6">
+            <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                <h2 class="text-2xl font-bold text-primary mb-3">Блок 1. «Територіальні претензії воюючих країн»</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-9 flex flex-col items-center bg-white p-4 rounded border border-[#d8cbba] relative">
+                        <div class="relative w-full max-w-[900px]" id="map-container-1">
+                            <img src="plans.jpg" alt="Карта" class="w-full h-auto object-contain rounded" onerror="this.src='https://via.placeholder.com/900x600?text=plans.jpg'">
+                            <svg class="connections" id="conn-svg-1"></svg>
+                            <!-- Країни -->
+                            <div id="m1-austria" onclick="clickB1('austria', 'country')" class="map-marker absolute w-7 h-7 bg-[#8C3F4D] border-2 border-white rounded-full shadow-lg flex items-center justify-center z-30" style="top: 40%; left: 6%;"></div>
+                            <div id="m1-germany" onclick="clickB1('germany', 'country')" class="map-marker absolute w-7 h-7 bg-[#8C3F4D] border-2 border-white rounded-full shadow-lg flex items-center justify-center z-30" style="top: 7%; left: 2%;"></div>
+                            <div id="m1-russia" onclick="clickB1('russia', 'country')" class="map-marker absolute w-7 h-7 bg-[#6F9FB5] border-2 border-white rounded-full shadow-lg flex items-center justify-center z-30" style="top: 5%; left: 58%;"></div>
+                            <div id="m1-romania" onclick="clickB1('romania', 'country')" class="map-marker absolute w-7 h-7 bg-[#6F9FB5] border-2 border-white rounded-full shadow-lg flex items-center justify-center z-30" style="top: 68%; left: 35%;"></div>
+                            <!-- Регіони -->
+                            <div id="m1-volyn" onclick="clickB1('volyn', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 26%; left: 33%;"></div>
+                            <div id="m1-podillia" onclick="clickB1('podillia', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 40%; left: 38%;"></div>
+                            <div id="m1-galychyna" onclick="clickB1('galychyna', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 34%; left: 29%;"></div>
+                            <div id="m1-bukovyna" onclick="clickB1('bukovyna', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 49%; left: 35%;"></div>
+                            <div id="m1-zakarpattia" onclick="clickB1('zakarpattia', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 45%; left: 26%;"></div>
+                            <div id="m1-central" onclick="clickB1('central', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 30%; left: 49%;"></div>
+                            <div id="m1-eastern" onclick="clickB1('eastern', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 44%; left: 69%;"></div>
+                            <div id="m1-bessarabia" onclick="clickB1('bessarabia', 'region')" class="map-marker absolute w-5 h-5 bg-yellow-400 border-2 border-black rounded-full shadow flex items-center justify-center z-30" style="top: 63%; left: 44%;"></div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 space-y-4">
+                        <div class="bg-primary text-paper p-3 rounded-lg shadow">
+                            <h3 class="font-bold text-xs uppercase mb-2 text-secondary border-b border-[#334e68] pb-1">⚡ Країни (Підказки)</h3>
+                            <div class="space-y-1.5" id="b1-countries-list"></div>
+                        </div>
+                        <div class="bg-primary text-paper p-3 rounded-lg shadow">
+                            <h3 class="font-bold text-xs uppercase mb-2 text-secondary border-b border-[#334e68] pb-1">🟡 Регіони (Підказки)</h3>
+                            <div class="space-y-1" id="b1-regions-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- БЛОК 2 -->
+        <section id="block-2" class="tab-content hidden relative">
+            <div class="sticky top-[104px] z-50 bg-cardbg/95 backdrop-blur p-4 border border-[#d8cbba] shadow-sm mb-6 flex flex-wrap gap-4 justify-between items-center rounded-lg">
+                <h2 class="text-xl md:text-2xl font-bold text-primary">Блок 2. «Військові битви»</h2>
+                <div class="flex gap-4 items-center">
+                    <button type="button" onclick="openZoomModal('battles.jpg')" class="bg-secondary text-white px-4 py-2.5 rounded font-bold shadow-md hover:bg-opacity-90 flex items-center gap-2"><span>💡</span> Підказка</button>
+                    <button type="button" onclick="checkAllB2()" class="bg-primary text-paper px-8 py-2.5 rounded font-bold shadow-md hover:bg-secondary">Перевірити</button>
+                </div>
+            </div>
+            
+            <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="battles-container"></div>
+            </div>
+        </section>
+
+        <!-- БЛОК 3 -->
+        <section id="block-3" class="tab-content hidden relative">
+            <div class="sticky top-[104px] z-50 bg-cardbg/95 backdrop-blur p-4 border border-[#d8cbba] shadow-sm mb-6 flex flex-wrap gap-4 justify-between items-center rounded-lg">
+                <h2 class="text-xl md:text-2xl font-bold text-primary">Блок 3. «Зміни лінії фронту»</h2>
+                <div class="flex gap-4 items-center">
+                    <button type="button" onclick="openZoomModal('1914-1917.jpg')" class="bg-secondary text-white px-4 py-2.5 rounded font-bold shadow-md hover:bg-opacity-90">💡 Підказка</button>
+                    <button type="button" onclick="checkFrontOrder()" class="bg-primary text-paper px-8 py-2.5 rounded font-bold shadow-md hover:bg-secondary">Перевірити</button>
+                    <button type="button" onclick="openFrontGallery()" id="gallery-btn" class="hidden bg-secondary text-white px-6 py-2.5 rounded font-bold shadow-md">🖼 Галерея</button>
+                </div>
+            </div>
+            
+            <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Ліва частина: Слоти вертикально -->
+                    <div class="lg:w-2/3 flex flex-col items-center">
+                        <div id="front-slots-container" class="flex flex-col items-center w-full max-w-lg"></div>
+                    </div>
+                    
+                    <!-- Права частина: Поле підказок -->
+                    <div class="lg:w-1/3 relative">
+                        <div class="sticky top-[200px] bg-paper p-5 rounded-lg shadow border border-secondary min-h-[300px]">
+                            <h3 class="font-bold text-primary mb-3 text-sm uppercase">Підказки (перетягніть):</h3>
+                            <div id="front-cards-pool" class="flex flex-col gap-4" ondragover="allowDrop(event)" ondrop="dropToPoolB3(event)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- БЛОК 4 -->
+        <section id="block-41" class="tab-content hidden relative">
+            <div class="sticky top-[104px] z-50 bg-cardbg/95 backdrop-blur p-4 border border-[#d8cbba] shadow-sm mb-6 flex flex-wrap gap-4 justify-between items-center rounded-lg">
+                <h2 class="text-xl md:text-2xl font-bold text-primary">Блок 4. Організації</h2>
+                <button type="button" onclick="checkFlashcards()" class="bg-primary text-paper px-8 py-2.5 rounded font-bold shadow-md hover:bg-secondary">Перевірити 4.1</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="flashcards-container"></div>
+        </section>
+
+        <!-- БЛОК 5 -->
+        <section id="block-42" class="tab-content hidden relative">
+            <div class="sticky top-[104px] z-50 bg-cardbg/95 backdrop-blur p-4 border border-[#d8cbba] shadow-sm mb-6 flex flex-wrap gap-4 justify-between items-center rounded-lg">
+                <h2 class="text-xl md:text-2xl font-bold text-primary">Блок 5. Постаті</h2>
+                <button type="button" onclick="checkFigures()" class="bg-primary text-paper px-8 py-2.5 rounded font-bold shadow-md hover:bg-secondary">Перевірити 4.2</button>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-6" id="figures-cards-container"></div>
+                <div class="lg:w-1/3 relative">
+                    <div class="sticky top-[200px] bg-paper p-5 rounded-lg shadow border border-secondary">
+                        <h3 class="font-bold text-primary mb-3 text-sm uppercase">Підказки (перетягніть):</h3>
+                        <div id="figures-hints-pool" class="flex flex-col gap-3 min-h-[200px]" ondragover="allowDrop(event)" ondrop="dropToPoolB42(event)"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+<!-- БЛОК 6 -->
+        <section id="block-5" class="tab-content hidden space-y-8">
+            <!-- Відео -->
+            <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                <h2 class="text-2xl font-bold text-primary mb-4">Блок 6. «Бойовий шлях УСС»</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="aspect-video bg-black rounded shadow overflow-hidden">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/3tQrGvrg72w?si=WGjNtH6cKZxPl6BI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <div class="aspect-video bg-black rounded shadow overflow-hidden">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/KZPzJQ_JjcA?si=5vTWJkAENlpBGrA_&amp;start=154" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Завдання 6.1 (Карта) -->
+            <div class="relative">
+                <!-- Закріплена шапка 5.1 -->
+                <div class="sticky top-[104px] z-50 bg-cardbg/95 backdrop-blur p-4 border border-[#d8cbba] shadow-sm mb-6 flex flex-wrap gap-4 justify-between items-center rounded-lg">
+                    <h2 class="text-xl md:text-2xl font-bold text-primary">Завдання 6.1. Карта бойового шляху</h2>
+                    <button type="button" onclick="checkB51()" class="bg-primary text-paper px-8 py-2.5 rounded font-bold shadow-md hover:bg-secondary">Перевірити 5.1</button>
+                </div>
+                
+                <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                    <!-- Змінено max-w-[900px] на max-w-[1100px] для збільшення карти -->
+                    <div class="relative w-full max-w-[1100px] mx-auto bg-white p-4 rounded border shadow-sm" id="b51-wrapper">
+                        
+                        <svg class="connections pointer-events-none absolute inset-0 w-full h-full" style="z-index: 10;" id="conn-svg-51"></svg>
+                        
+                        <div class="flex flex-wrap justify-center gap-2 mb-6 relative" style="z-index: 40;" id="b51-text-pool-top"></div>
+                        
+                        <div class="relative w-full mx-auto" id="map-container-51">
+                            <img src="uss.jpg" alt="Карта УСС" class="w-full h-auto object-contain border rounded" onerror="this.src='https://via.placeholder.com/800x500?text=uss.jpg'">
+                            
+                            <!-- Мітки на карті -->
+                            <div id="m51-uzhok" title="Ужоцький перевал" onclick="clickB51('uzhok', 'pin')" class="map-marker absolute w-5 h-5 bg-red-600 border-2 border-white rounded-full shadow cursor-pointer" style="top:30%; left:13%; z-index: 30;"></div>
+                            <div id="m51-makivka" title="Гора Маківка" onclick="clickB51('makivka', 'pin')" class="map-marker absolute w-5 h-5 bg-red-600 border-2 border-white rounded-full shadow cursor-pointer" style="top:37%; left:18%; z-index: 30;"></div>
+                            <div id="m51-stryi" title="Стрий" onclick="clickB51('stryi', 'pin')" class="map-marker absolute w-5 h-5 bg-red-600 border-2 border-white rounded-full shadow cursor-pointer" style="top:28%; left:33%; z-index: 30;"></div>
+                            <div id="m51-lviv" title="Львів" onclick="clickB51('lviv', 'pin')" class="map-marker absolute w-5 h-5 bg-red-600 border-2 border-white rounded-full shadow cursor-pointer" style="top:6%; left:36%; z-index: 30;"></div>
+                            <div id="m51-lysonia" title="Бережани / г. Лисоня" onclick="clickB51('lysonia', 'pin')" class="map-marker absolute w-5 h-5 bg-red-600 border-2 border-white rounded-full shadow cursor-pointer" style="top:22%; left:46%; z-index: 30;"></div>
+                            <div id="m51-koniukhy" title="Конюхи" onclick="clickB51('koniukhy', 'pin')" class="map-marker absolute w-5 h-5 bg-red-600 border-2 border-white rounded-full shadow cursor-pointer" style="top:19%; left:50%; z-index: 30;"></div>
+                        </div>
+
+                        <div class="flex flex-wrap justify-center gap-2 mt-6 relative" style="z-index: 40;" id="b51-text-pool-bottom"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Зображення таймлайну -->
+            <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                 <img src="uss-timeline.jpg" alt="Таймлайн" class="w-full h-auto rounded border" onerror="this.src='https://via.placeholder.com/800x200?text=uss-timeline.jpg'">
+            </div>
+
+            <!-- Завдання 6.2 (Аудіо) -->
+            <div class="relative">
+                <!-- Закріплена шапка 5.2 -->
+                <div class="sticky top-[104px] z-50 bg-cardbg/95 backdrop-blur p-4 border border-[#d8cbba] shadow-sm mb-6 flex flex-wrap gap-4 justify-between items-center rounded-lg">
+                    <h2 class="text-xl md:text-2xl font-bold text-primary">Завдання 6.2. Пісні УСС</h2>
+                    <button type="button" onclick="checkB52()" class="bg-primary text-paper px-8 py-2.5 rounded font-bold shadow-md hover:bg-secondary">Перевірити 5.2</button>
+                </div>
+                
+                <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+                    <div class="w-full" id="audio-container-52">
+                        <div id="b52-audio-list" class="flex flex-col gap-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- БЛОК 7 -->
+    <section id="block-6" class="tab-content hidden space-y-6">
+    <div class="bg-cardbg p-6 rounded-lg shadow border border-[#e5d8c3]">
+        <h2 class="text-2xl font-bold text-primary mb-3">Блок 7. Завдання для самоперевірки</h2>
+        
+        <!-- Контейнер для тестових завдань 1-11 -->
+        <div id="b6-questions-container" class="space-y-4"></div>
+        
+        <!-- Матриця (Завдання 12) -->
+        <div class="mt-8 bg-white p-6 rounded border border-gray-300 shadow-sm" id="b6-matrix-container">
+            <h3 class="text-lg font-bold text-primary mb-4">12. Увідповідніть уривок історичного джерела (1-4), у якому відображено позицію щодо Першої світової війни, з назвою політичної сили (А-Д).</h3>
+            <div id="b6-matrix-content"></div>
+            <button type="button" onclick="checkB6Matrix()" class="mt-4 bg-primary text-white px-6 py-2 rounded font-bold hover:bg-[#334e68] shadow transition">Перевірити 12 завдання</button>
+        </div>
+        
+        <!-- Підсумковий результат -->
+        <div class="mt-8 flex flex-col items-center border-t border-[#e5d8c3] pt-6">
+            <button id="b6-finish-btn" type="button" onclick="calculateB6Results()" class="bg-[#047857] text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-800 shadow-lg transition">Завершити та показати результат</button>
+            <div id="b6-results-display" class="hidden mt-6 p-6 bg-white rounded-lg border-2 border-[#047857] shadow-md w-full max-w-sm text-left"></div>
+        </div>
+    </div>
+</section>
+
+    </main>
+
+    <!-- МОДАЛЬНЕ ВІКНО ЗУМУ -->
+    <div id="zoom-modal" class="fixed inset-0 bg-black/95 hidden z-[100] flex flex-col p-2">
+        <div class="w-full flex justify-between items-center mb-2 px-4 h-12 shrink-0">
+            <h3 class="font-bold text-white text-lg">Перегляд</h3>
+            <div class="flex gap-4 items-center">
+                <input type="range" id="zoom-slider" min="100" max="400" value="100" class="w-32 cursor-pointer" oninput="applyZoom(this.value)">
+                <span id="zoom-percent" class="text-white text-sm w-12">100%</span>
+                <button type="button" onclick="toggleModal('zoom-modal')" class="bg-accent text-white px-4 py-1.5 rounded font-bold">✕ Закрити</button>
+            </div>
+        </div>
+        <div class="flex-grow w-full zoom-scroll overflow-auto bg-[#111] rounded flex items-center justify-center">
+            <img id="zoom-img" src="" alt="Zoom" class="max-w-none transition-all duration-100 object-contain" style="width: 100%; height: 100%;">
+        </div>
+    </div>
+
+    <script>
+        // --- Глобальні змінні стану ---
+        let state = JSON.parse(localStorage.getItem('ww1_state')) || { activeTab: 1 };
+        function saveState() { localStorage.setItem('ww1_state', JSON.stringify(state)); }
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`block-${id}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-secondary', 'text-white'); b.classList.add('bg-primary', 'text-paper');
+                if (b.getAttribute('data-tab') == id) { b.classList.add('bg-secondary', 'text-white'); b.classList.remove('bg-primary', 'text-paper'); }
+            });
+            window.scrollTo(0,0);
+            state.activeTab = id; 
+            saveState();
+            
+            // МАГІЯ ДЛЯ ЛІНІЙ: браузер не малює SVG у прихованих (display:none) блоках.
+            // Перемальовуємо їх із затримкою, коли вкладка вже відкрилась.
+            setTimeout(() => {
+                if (id == 1 && typeof redrawB1 === 'function') redrawB1();
+                if (id == 5 && typeof redrawB51 === 'function') redrawB51();
+            }, 50);
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e=>{});
+            else document.exitFullscreen();
+        }
+
+        function clearAllData() {
+            if (confirm('Очистити всі відповіді назавжди?')) { localStorage.removeItem('ww1_state'); location.reload(); }
+        }
+
+        function openZoomModal(src) {
+            const modal = document.getElementById('zoom-modal');
+            const img = document.getElementById('zoom-img');
+            const slider = document.getElementById('zoom-slider');
+            img.src = src; slider.value = 100; applyZoom(100);
+            modal.classList.remove('hidden');
+        }
+        function toggleModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function applyZoom(val) {
+            document.getElementById('zoom-percent').textContent = val + '%';
+            const img = document.getElementById('zoom-img');
+            if (val == 100) { img.style.width = '100%'; img.style.height = '100%'; img.classList.add('object-contain'); }
+            else { img.style.width = val + '%'; img.style.height = 'auto'; img.classList.remove('object-contain'); }
+        }
+
+        function drawLine(svgId, id1, id2, color) {
+            const svg = document.getElementById(svgId);
+            const el1 = document.getElementById(id1); const el2 = document.getElementById(id2);
+            if(!svg || !el1 || !el2) return;
+            const rectSvg = svg.getBoundingClientRect();
+            const r1 = el1.getBoundingClientRect(); const r2 = el2.getBoundingClientRect();
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', r1.left + r1.width/2 - rectSvg.left); line.setAttribute('y1', r1.top + r1.height/2 - rectSvg.top);
+            line.setAttribute('x2', r2.left + r2.width/2 - rectSvg.left); line.setAttribute('y2', r2.top + r2.height/2 - rectSvg.top);
+            line.setAttribute('stroke', color); line.setAttribute('stroke-width', '4'); line.setAttribute('stroke-linecap', 'round');
+            if(svgId === 'conn-svg-1') line.setAttribute('stroke-dasharray', '6,6');
+            svg.appendChild(line);
+        }
+
+        /* ================= БЛОК 1 ================= */
+        const b1Data = {
+            countries: [{id:'austria',n:'Австро-Угорщина'},{id:'germany',n:'Німеччина'},{id:'russia',n:'Росія'},{id:'romania',n:'Румунія'}],
+            regions: [{id:'volyn',n:'Волинь'},{id:'podillia',n:'Поділля'},{id:'galychyna',n:'Східна Галичина'},{id:'bukovyna',n:'Північна Буковина'},{id:'zakarpattia',n:'Закарпаття'},{id:'central',n:'Центральна Україна'},{id:'eastern',n:'Східна Україна'},{id:'bessarabia',n:'Південна Бессарабія'}],
+            correct: {'austria':['volyn','podillia'], 'germany':['volyn','podillia','central','eastern'], 'russia':['galychyna','bukovyna','zakarpattia'], 'romania':['bessarabia']}
+        };
+        let b1Selected = {type: null, id: null};
+        state.b1Conns = state.b1Conns || [];
+
+        function initB1() {
+            document.getElementById('b1-countries-list').innerHTML = b1Data.countries.map(c=>`<div id="hint-${c.id}" onclick="highlightHintB1('${c.id}')" class="p-2 bg-[#1b2d42] rounded cursor-pointer hover:bg-secondary transition text-xs flex justify-between"><span>${c.n}</span><span class="w-2.5 h-2.5 rounded-full ${c.id==='russia'||c.id==='romania'?'bg-[#6F9FB5]':'bg-[#8C3F4D]'}"></span></div>`).join('');
+            document.getElementById('b1-regions-list').innerHTML = b1Data.regions.map(r=>`<div id="hint-${r.id}" onclick="highlightHintB1('${r.id}')" class="p-1.5 bg-[#1b2d42] rounded cursor-pointer hover:bg-secondary transition text-xs">${r.n}</div>`).join('');
+            redrawB1();
+        }
+
+        function highlightHintB1(id) {
+            let marker = document.getElementById(`m1-${id}`);
+            if(marker) {
+                marker.classList.add('ring-4', 'ring-white', 'scale-125', 'z-[60]');
+                setTimeout(() => marker.classList.remove('ring-4', 'ring-white', 'scale-125', 'z-[60]'), 1500);
+            }
+        }
+
+        function clickB1(id, type) {
+            document.querySelectorAll('[id^="m1-"]').forEach(el => el.classList.remove('marker-selected'));
+            if (b1Selected.id === id) { b1Selected = {type:null, id:null}; return; }
+            if (!b1Selected.id) {
+                b1Selected = {type, id}; document.getElementById(`m1-${id}`)?.classList.add('marker-selected');
+            } else {
+                if (b1Selected.type === type) {
+                    b1Selected = {type, id}; document.getElementById(`m1-${id}`)?.classList.add('marker-selected');
+                } else {
+                    let cId = b1Selected.type === 'country' ? b1Selected.id : id;
+                    let rId = b1Selected.type === 'region' ? b1Selected.id : id;
+                    let existing = state.b1Conns.findIndex(x => x.c === cId && x.r === rId);
+                    if (existing !== -1) { state.b1Conns.splice(existing, 1); } 
+                    else {
+                        let isCorrect = b1Data.correct[cId].includes(rId);
+                        state.b1Conns.push({c: cId, r: rId, color: isCorrect ? '#008763' : '#8C3F4D'});
+                    }
+                    b1Selected = {type:null, id:null};
+                    saveState(); redrawB1();
+                }
+            }
+        }
+        
+        function redrawB1() {
+            document.getElementById('conn-svg-1').innerHTML = '';
+            state.b1Conns.forEach(c => drawLine('conn-svg-1', `m1-${c.c}`, `m1-${c.r}`, c.color));
+        }
+
+        /* ================= БЛОК 2 ================= */
+        const b2Data = [
+            { id: 1, img: '1916-battle.jpg', name: 'Брусиловський прорив', year: '1916' },
+            { id: 2, img: '1914-battle.jpg', name: 'Галицька битва', year: '1914' },
+            { id: 3, img: '1917-battle.jpg', name: 'Червневий наступ / Офензива Керенського', year: '1917' },
+            { id: 4, img: '1915-gorlic-battle.jpg', name: 'Горлицький прорив', year: '1915' },
+            { id: 5, img: '1915-carpathians-battle.jpg', name: 'Карпатська операція', year: '1915' }
+        ];
+        state.b2Ans = state.b2Ans || {};
+
+        function initB2() {
+            document.getElementById('battles-container').innerHTML = b2Data.map((b, i) => {
+                let ans = state.b2Ans[i] || {n:'', y:'', nC:'', yC:''};
+                return `
+                <div class="bg-white p-4 rounded border shadow flex flex-col justify-between">
+                    <div>
+                        <div class="relative w-full h-56 bg-gray-100 rounded mb-3 flex items-center justify-center p-2 cursor-pointer" onclick="openZoomModal('${b.img}')">
+                            <img src="${b.img}" class="w-full h-full object-contain hover:scale-105 transition-transform" onerror="this.src='https://via.placeholder.com/300x200?text=Карта'">
+                            <button class="absolute bottom-1 right-1 bg-primary text-white text-xs px-2 py-1 rounded shadow">⛶</button>
+                        </div>
+                        <div class="space-y-2">
+                            <!-- Додано 'n' у виклик функції changeB2 -->
+                            <select id="b2-n-${i}" onchange="changeB2(${i}, 'n')" class="w-full p-2 border rounded text-sm bg-paper outline-none transition-colors" style="background-color:${ans.nC}">
+                                <option value="" disabled ${!ans.n?'selected':''}>-- Оберіть битву --</option>
+                                ${['Брусиловський прорив','Галицька битва','Горлицький прорив','Карпатська операція','Червневий наступ / Офензива Керенського'].map(o=>`<option ${ans.n===o?'selected':''}>${o}</option>`).join('')}
+                            </select>
+                            <!-- Додано 'y' у виклик функції changeB2 -->
+                            <select id="b2-y-${i}" onchange="changeB2(${i}, 'y')" class="w-full p-2 border rounded text-sm bg-paper outline-none transition-colors" style="background-color:${ans.yC}">
+                                <option value="" disabled ${!ans.y?'selected':''}>-- Оберіть рік --</option>
+                                ${['1914','1915','1916','1917'].map(o=>`<option ${ans.y===o?'selected':''}>${o}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Оновлена функція, яка скидає колір ЛИШЕ для зміненого поля
+        function changeB2(i, field) {
+            let el = document.getElementById(`b2-${field}-${i}`);
+            el.style.backgroundColor = ''; // Очищаємо колір у HTML
+            
+            if (!state.b2Ans[i]) {
+                state.b2Ans[i] = { n: '', y: '', nC: '', yC: '' };
+            }
+            
+            // Записуємо нове значення та скидаємо колір лише для конкретного ключа (nC або yC)
+            state.b2Ans[i][field] = el.value;
+            state.b2Ans[i][field + 'C'] = ''; 
+            
+            saveState();
+        }
+
+        // Нова функція, яка перевіряє всі картки одночасно
+        function checkAllB2() {
+            b2Data.forEach((b, i) => {
+                let ans = state.b2Ans[i] || {};
+                
+                // Перевіряємо назву
+                if(ans.n) {
+                    ans.nC = (ans.n === b.name) ? '#D1FAE5' : '#FDE8E8';
+                    document.getElementById(`b2-n-${i}`).style.backgroundColor = ans.nC;
+                }
+                
+                // Перевіряємо рік
+                if(ans.y) {
+                    ans.yC = (ans.y === b.year) ? '#D1FAE5' : '#FDE8E8';
+                    document.getElementById(`b2-y-${i}`).style.backgroundColor = ans.yC;
+                }
+            });
+            saveState();
+        }
+
+        /* ================= БЛОК 3 ================= */
+        const b3Data = [
+            { id: 1, title: 'Кордони напередодні Першої світової війни', img: 'before war.jpg' },
+            { id: 2, title: 'Лінія фронту після Галицької операції', img: '1914-galich.jpg' },
+            { id: 3, title: 'Лінія фронту після Горлицького прориву', img: '1915-gorlic.jpg' },
+            { id: 4, title: 'Лінія фронту наприкінці 1915 року', img: '1915-end.jpg' },
+            { id: 5, title: 'Лінія фронту після Брусиловського прориву і наприкінці 1916 року', img: '1916-end.jpg' },
+            { id: 6, title: 'Лінія фронту з середини 1917 року', img: '1917.jpg' }
+        ];
+        state.b3Ans = state.b3Ans || { pool: b3Data.map(d=>d.id).sort(()=>Math.random()-0.5), slots: [null,null,null,null,null,null], colors: [] };
+
+        function initB3() {
+            const pool = document.getElementById('front-cards-pool');
+            const slots = document.getElementById('front-slots-container');
+            pool.innerHTML = ''; slots.innerHTML = '';
+            
+            state.b3Ans.slots.forEach((cId, i) => {
+                let isLast = i === state.b3Ans.slots.length - 1;
+                slots.innerHTML += `
+                <div class="w-full relative">
+                    <div class="bg-white p-3 rounded-lg shadow flex gap-4 w-full border border-gray-200" style="background-color:${state.b3Ans.colors[i]||''}">
+                        <div class="w-12 h-12 rounded-full bg-secondary text-white font-bold flex items-center justify-center shrink-0 shadow-inner border-2 border-white">${i+1}</div>
+                        <div id="b3-s-${i}" class="flex-grow border-2 border-dashed border-gray-300 rounded flex items-center justify-center p-2 min-h-[140px] bg-gray-50/50" ondragover="allowDrop(event)" ondrop="dropB3(event, ${i})">
+                            ${cId ? renderB3Card(cId) : '<span class="text-sm text-gray-400 font-medium no-pointer-events">Перетягніть карту сюди</span>'}
+                        </div>
+                    </div>
+                    ${!isLast ? '<div class="arrow-down"></div>' : ''}
+                </div>`;
+            });
+            state.b3Ans.pool.forEach(cId => { if(cId) pool.innerHTML += renderB3Card(cId); });
+        }
+        
+        function renderB3Card(id) {
+            let card = b3Data.find(c=>c.id==id);
+            return `
+            <div draggable="true" ondragstart="dragB3(event, ${id})" id="b3-c-${id}" class="bg-white p-2 rounded shadow-md border border-[#d8cbba] w-full max-w-[280px] cursor-grab hover:shadow-lg transition">
+                <div class="relative w-full h-36 bg-gray-100 rounded mb-2 overflow-hidden border">
+                    <img src="${card.img}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x200?text=${encodeURIComponent(card.img)}'">
+                    <button type="button" onclick="openZoomModal('${card.img}')" class="absolute bottom-1 right-1 bg-primary/80 text-white text-xs px-2 py-1 rounded shadow cursor-pointer hover:bg-primary">⛶</button>
+                </div>
+                <p class="text-xs font-bold leading-tight text-center pointer-events-none">${card.title}</p>
+            </div>`;
+        }
+        
+        function dragB3(e, id) { e.dataTransfer.setData('text', id); }
+        function allowDrop(e) { e.preventDefault(); }
+        
+        function dropB3(e, slotIdx) {
+            e.preventDefault();
+            let cId = parseInt(e.dataTransfer.getData('text'));
+            
+            let poolIdx = state.b3Ans.pool.indexOf(cId);
+            if(poolIdx > -1) state.b3Ans.pool.splice(poolIdx, 1);
+            let oldSlotIdx = state.b3Ans.slots.indexOf(cId);
+            if(oldSlotIdx > -1) { state.b3Ans.slots[oldSlotIdx] = null; state.b3Ans.colors[oldSlotIdx] = ''; } 
+
+            if(state.b3Ans.slots[slotIdx]) state.b3Ans.pool.push(state.b3Ans.slots[slotIdx]);
+            
+            state.b3Ans.slots[slotIdx] = cId;
+            state.b3Ans.colors[slotIdx] = '';
+            saveState(); initB3();
+        }
+        
+        function dropToPoolB3(e) {
+            e.preventDefault();
+            let cId = parseInt(e.dataTransfer.getData('text'));
+            let oldSlotIdx = state.b3Ans.slots.indexOf(cId);
+            if(oldSlotIdx > -1) {
+                state.b3Ans.slots[oldSlotIdx] = null;
+                state.b3Ans.colors[oldSlotIdx] = ''; 
+                state.b3Ans.pool.push(cId);
+                saveState(); initB3();
+            }
+        }
+        
+        function checkFrontOrder() {
+            let ok = true;
+            state.b3Ans.slots.forEach((cId, i) => {
+                if(cId) {
+                    state.b3Ans.colors[i] = (cId === i+1) ? '#D1FAE5' : '#FEE2E2';
+                    if (cId !== i+1) ok = false;
+                } else ok = false;
+            });
+            if (ok) document.getElementById('gallery-btn').classList.remove('hidden');
+            saveState(); initB3();
+        }
+
+        let galIdx = 0;
+        function openFrontGallery() { openZoomModal(b3Data[galIdx].img); }
+
+        /* ================= БЛОК 4 ================= */
+        const b41Data = [
+            { t: "ГУР", b: "ГОЛОВНА УКРАЇНСЬКА РАДА – <br>міжпартійна організація, створена представниками провідних українських політичних сил Галичини (національно-демократичної, радикальної та соціал-демократичної партій). У травні 1915 р. була реорганізована в ЗУР", y:"1914", p:"Львів", l:"Кость Левицький", w:"підтримка Австро-Угорщини" },
+            { t: "УСС", b: "ЛЕГІОН УКРАЇНСЬКИХ СІЧОВИХ СТРІЛЬЦІВ – <br>українське добровольче перше українське національне військове формування у складі австро-угорської армії в період Першої світової війни, створене за ініціативи ГУР", y:"1914", p:"Львів", l:"Михайло Галущинський", w:"підтримка Австро-Угорщини" },
+            { t: "Бойова управа УСС", b: "БОЙОВА УПРАВА УКРАЇНСЬКИХ СІЧОВИХ СТРІЛЬЦІВ –  <br>громадсько-політичний комітет, заснований для організації та поповнення Легіону Українських січових стрільців. Ініціаторами створення були делегати від ГУР, Українського січового союзу та товариства «Сокіл»", y:"1914", p:"Львів", l:"Кирило Трильовський", w:"підтримка Австро-Угорщини" },
+            { t: "СВУ", b: "СОЮЗ ВИЗВОЛЕННЯ УКРАЇНИ –  <br>українська позапартійна політична організація, заснована у Львові політичними емігрантами з Наддніпрянщини. Прагнув проголошення державної самостійності та соборності України шляхом поразки Російської імперії у Першій світовій війні", y:"1914", p:"Львів", l:"Дмитро Донцов", w:"підтримка Австро-Угорщини" },
+            { t: "ЗУР", b: "ЗАГАЛЬНА УКРАЇНСЬКА РАДА –  <br>загальноукраїнська політична організація, що координувала діяльність українських політичних сил Галичини, Буковини та Наддніпрянщини (через СВУ) в Австро-Угорщині. Саморозпустилася  у листопаді 1916 р. на знак протесту проти утворення австрійською владою Польського королівства", y:"1915", p:"Відень", l:"Кость Левицький", w:"підтримка Австро-Угорщини" },
+            { t: "Галицько-Буковинське генерал-губернаторство", b: "ГАЛИЦЬКО-БУКОВИНСЬКЕ ГЕНЕРАЛ-ГУБЕРНАТОРСТВО –  <br> тимчасова адміністративно-територіальна одиниця, створена урядом Російської імперії на окупованих  землях Галичини, Буковини і Посяння. Існувало у 1914-1915 та 1916-1917 рр.", y:"1914", p:"Чернівці", l:"Георгій Бобринський", w:"підтримка Росії" },
+            { t: "Українська парламентарна репрезентація", b: "УКРАЇНСЬКЕ ПАРЛАМЕНТСЬКЕ ПРЕДСТАВНИЦТВО –  <br>об'єднання українських депутатів австрійського парламенту та крайових сеймів, яке  відстоювало політичні права українців Галичини й Буковини. Після саморозпуску ЗУР у листопаді 1916 р. перебрало на себе керівництво українським рухом", y:"1916", p:"Відень", l:"Юліан Романчук", w:"підтримка Австро-Угорщини" },
+            { t: "Карпато-Руський визвольний комітет", b: "КАРПАТО-РУСЬКИЙ ВИЗВОЛЬНИЙ КОМІТЕТ –  <br>москвофільська організація, створена 1914 р. у Києві галицькими емігрантами; закликала галичан підтримувати російську армію", y:"1914", p:"Київ", l:"Юліан Яворський", w:"підтримка Росії" },
+            { t: "ТУП", b: "ТОВАРИСТВО УКРАЇНСЬКИХ ПОСТУПОВЦІВ –  <br>нелегальна міжпартійна громадсько-політична організація ліберально-демократичного спрямування, що діяла в Наддніпрянській Україні у 1908–1917 роках. До 1917 року ТУП фактично очолювало український національний рух. Керівним органом була Рада ТУП", y:"1908", p:"Київ", l:"Михайло Грушевський", w:"підтримка Росії; нейтралітет" },
+            { t: "УСДРП", b: "УКРАЇНСЬКА СОЦІАЛ-ДЕМОКРАТИЧНА РОБІТНИЧА ПАРТІЯ–  <br>українська політична марксистська партія, яка діяла з грудня 1905 року. Не мала єдиного офіційного голови. У роки війни позицію керівництва партії відзначали дві основні групи впливу та їхні лідери: помірковано-«оборонська» та пацифістська", y:"1905", p:"Київ", l:"Володимир Винниченко", w:"підтримка Росії; нейтралітет" }
+        ];
+        state.b41Ans = state.b41Ans || {};
+
+        const optY = ['1905', '1908', '1914', '1915', '1916'];
+        const optP = ['Відень', 'Київ', 'Львів', 'Чернівці'];
+        const optL = ['Володимир Винниченко', 'Георгій Бобринський', 'Дмитро Донцов', 'Кирило Трильовський', 'Кость Левицький', 'Михайло Галущинський', 'Михайло Грушевський', 'Симон Петлюра', 'Юліан Романчук', 'Юліан Яворський'];
+        const optW = ['нейтралітет', 'підтримка Австро-Угорщини', 'підтримка Росії', 'підтримка Росії; нейтралітет'];
+
+        function initB41() {
+            document.getElementById('flashcards-container').innerHTML = b41Data.map((d,i) => {
+                let a = state.b41Ans[i] || {};
+                return `
+                <div class="bg-white p-4 rounded-xl border shadow flex flex-col gap-3">
+                    <!-- Змінено h-64 на h-48 для зменшення висоти картки -->
+                    <div class="perspective-1000 h-48 cursor-pointer" onclick="this.querySelector('.transform-style-3d').classList.toggle('rotate-y-180')">
+                        <div class="transform-style-3d transition-transform duration-500 relative w-full h-full rounded shadow-inner bg-sky-100 flex items-center justify-center border border-gray-200">
+                            <div class="backface-hidden absolute p-2 font-bold text-center text-lg">${d.t}</div>
+                            <!-- Змінено p-4 на p-3 для оптимізації внутрішнього простору -->
+                            <div class="backface-hidden absolute inset-0 p-3 text-[14px] leading-snug sm:text-sm rotate-y-180 overflow-hidden bg-paper font-medium text-center flex flex-col items-center justify-center">${d.b}</div>
+                        </div>
+                    </div>
+                    <select id="b41-y-${i}" onchange="changeB41(${i}, 'y')" style="background-color:${a.yc||''}" class="p-2 border rounded text-sm bg-white"><option value="">-- Час створення --</option>${optY.map(o=>`<option ${a.y===o?'selected':''}>${o}</option>`).join('')}</select>
+                    <select id="b41-p-${i}" onchange="changeB41(${i}, 'p')" style="background-color:${a.pc||''}" class="p-2 border rounded text-sm bg-white"><option value="">-- Місце створення --</option>${optP.map(o=>`<option ${a.p===o?'selected':''}>${o}</option>`).join('')}</select>
+                    <select id="b41-l-${i}" onchange="changeB41(${i}, 'l')" style="background-color:${a.lc||''}" class="p-2 border rounded text-sm bg-white"><option value="">-- Голова або лідер --</option>${optL.map(o=>`<option ${a.l===o?'selected':''}>${o}</option>`).join('')}</select>
+                    <select id="b41-w-${i}" onchange="changeB41(${i}, 'w')" style="background-color:${a.wc||''}" class="p-2 border rounded text-sm bg-white"><option value="">-- Ставлення до війни --</option>${optW.map(o=>`<option ${a.w===o?'selected':''}>${o}</option>`).join('')}</select>
+                </div>`;
+            }).join('');
+        }
+        
+        function changeB41(i, field) {
+            let el = document.getElementById(`b41-${field}-${i}`); el.style.backgroundColor='';
+            if(!state.b41Ans[i]) state.b41Ans[i] = {};
+            state.b41Ans[i][field] = el.value;
+            state.b41Ans[i][field+'c'] = '';
+            saveState();
+        }
+        
+        function checkFlashcards() {
+            b41Data.forEach((d,i) => {
+                let a = state.b41Ans[i] || {};
+                if(a.y) a.yc = (a.y === d.y) ? '#D1FAE5' : '#FEE2E2';
+                if(a.p) a.pc = (a.p === d.p) ? '#D1FAE5' : '#FEE2E2';
+                if(a.l) a.lc = (a.l === d.l) ? '#D1FAE5' : '#FEE2E2';
+                if(a.w) a.wc = (a.w === d.w) ? '#D1FAE5' : '#FEE2E2';
+                
+                if(a.y) document.getElementById(`b41-y-${i}`).style.backgroundColor = a.yc;
+                if(a.p) document.getElementById(`b41-p-${i}`).style.backgroundColor = a.pc;
+                if(a.l) document.getElementById(`b41-l-${i}`).style.backgroundColor = a.lc;
+                if(a.w) document.getElementById(`b41-w-${i}`).style.backgroundColor = a.wc;
+            });
+            saveState();
+        }
+
+        /* ================= БЛОК 5 ================= */
+        const b42Data = [
+            { img: "Myhaylo_Hrushevskiy.jpg", n: "Михайло Грушевський", hint: "Один із провідних діячів ТУП, історик. заарештований російською владою під час окупації Галичини т висланий до Росії" },
+            { img: "dmytro-dontsov.jpg", n: "Дмитро Донцов", hint: "Публіцист, засновник ідеології інтегрального націоналізму, голова СВУ" },
+            { img: "Levytsky_Kost.jpg", n: "Кость Левицький", hint: "Голова ГУР та ЗУР в роки Першої світової війни" },
+            { img: "Mykhailo_Halushchynskyi.jpg", n: "Михайло Галущинський", hint: "Перший отаман (командант) легіону УСС" },
+            { img: "Andrzej_Szeptycki.jpg", n: "Андрей Шептицький", hint: "Митрополит греко-католицької церкви, заарештований російською владою під час окупації Галичини" },
+            { img: "Vynnychenko.jpg", n: "Володимир Винниченко", hint: "Письменник, один із лідерів УСДРП. Під час війни виступав проти орієнтації українського руху на воюючі імперії" },
+            { img: "juk.jpg", n: "Андрій Жук", hint: "Історик, дипломат, член ГУР, ЗУР, співзасновник СВУ" },
+            { img: "vishivaniy.jpg", n: "Василь Вишиваний", hint: "Aвстрійський архікнязь династії Габсбурґів, полковник Легіону УСС. Прихильник українського руху" },
+            { img: "romanchuk.jpg", n: "Юліан Романчук", hint: "Голова УНДП, лідер Українського парламентського представництва" },
+            { img: "petlura.jpg", n: "Симон Петлюра", hint: "Один із лідерів УСДРП, автор статті «Війна і українці». З 1917 р. очолював Український Військовий Комітет Західного фронту у Мінську" }
+        ];
+        const names42 = ['Андрей Шептицький', 'Андрій Жук', 'Василь Вишиваний', 'Володимир Винниченко', 'Дмитро Донцов', 'Кость Левицький', 'Михайло Галущинський', 'Михайло Грушевський', 'Симон Петлюра', 'Юліан Романчук'];
+
+        state.b42Ans = state.b42Ans || { 
+            pool: b42Data.map((d,i)=>i).sort(()=>Math.random()-0.5), 
+            slots: Array(10).fill(null), 
+            selects: Array(10).fill(''),
+            sColors: Array(10).fill(''),
+            dColors: Array(10).fill('')
+        };
+
+        function initB42() {
+            const container = document.getElementById('figures-cards-container');
+            const pool = document.getElementById('figures-hints-pool');
+            container.innerHTML = ''; pool.innerHTML = '';
+
+            b42Data.forEach((d, i) => {
+                let sel = state.b42Ans.selects[i];
+                let hintIdx = state.b42Ans.slots[i];
+                
+                container.innerHTML += `
+                <div class="bg-white p-4 rounded-xl border shadow flex flex-col gap-3">
+                    <img src="${d.img}" class="w-full aspect-square object-cover object-top rounded border bg-gray-100" onerror="this.src='https://via.placeholder.com/300?text=Портрет'">
+                    <select id="b42-s-${i}" onchange="changeB42(${i})" style="background-color:${state.b42Ans.sColors[i]||''}" class="p-2 border rounded text-sm font-medium w-full">
+                        <option value="">-- Прізвище, ім'я --</option>
+                        ${names42.map(n=>`<option ${sel===n?'selected':''}>${n}</option>`).join('')}
+                    </select>
+                    <div id="b42-d-${i}" class="flex-grow border-2 border-dashed border-gray-300 rounded p-2 text-xs flex items-center justify-center min-h-[80px]" style="background-color:${state.b42Ans.dColors[i]||''}" ondragover="allowDrop(event)" ondrop="dropB42(event, ${i})">
+                        ${hintIdx !== null ? renderB42Hint(hintIdx) : '<span class="text-gray-400 no-pointer-events text-center">Перетягніть характеристику</span>'}
+                    </div>
+                </div>`;
+            });
+
+            state.b42Ans.pool.forEach(idx => {
+                if(idx !== null) pool.innerHTML += renderB42Hint(idx);
+            });
+        }
+
+        function renderB42Hint(idx) {
+            return `<div draggable="true" ondragstart="dragB42(event, ${idx})" class="bg-white p-2 rounded shadow border text-xs cursor-grab w-full font-medium">${b42Data[idx].hint}</div>`;
+        }
+
+        function changeB42(i) {
+            let el = document.getElementById(`b42-s-${i}`); el.style.backgroundColor='';
+            state.b42Ans.selects[i] = el.value; state.b42Ans.sColors[i] = '';
+            saveState();
+        }
+
+        function dragB42(e, idx) { e.dataTransfer.setData('hint', idx); }
+        
+        function dropB42(e, slotIdx) {
+            e.preventDefault();
+            let hIdx = parseInt(e.dataTransfer.getData('hint'));
+            if(isNaN(hIdx)) return;
+
+            let poolIdx = state.b42Ans.pool.indexOf(hIdx);
+            if(poolIdx > -1) state.b42Ans.pool.splice(poolIdx, 1);
+            let oldSlotIdx = state.b42Ans.slots.indexOf(hIdx);
+            if(oldSlotIdx > -1) { state.b42Ans.slots[oldSlotIdx] = null; state.b42Ans.dColors[oldSlotIdx] = ''; }
+
+            if(state.b42Ans.slots[slotIdx] !== null) state.b42Ans.pool.push(state.b42Ans.slots[slotIdx]);
+            
+            state.b42Ans.slots[slotIdx] = hIdx;
+            state.b42Ans.dColors[slotIdx] = '';
+            saveState(); initB42();
+        }
+
+        function dropToPoolB42(e) {
+            e.preventDefault();
+            let hIdx = parseInt(e.dataTransfer.getData('hint'));
+            if(isNaN(hIdx)) return;
+            let oldSlotIdx = state.b42Ans.slots.indexOf(hIdx);
+            if(oldSlotIdx > -1) {
+                state.b42Ans.slots[oldSlotIdx] = null;
+                state.b42Ans.dColors[oldSlotIdx] = '';
+                state.b42Ans.pool.push(hIdx);
+                saveState(); initB42();
+            }
+        }
+
+        function checkFigures() {
+            b42Data.forEach((d, i) => {
+                let sel = state.b42Ans.selects[i];
+                let hintIdx = state.b42Ans.slots[i];
+                
+                if(sel) {
+                    state.b42Ans.sColors[i] = (sel === d.n) ? '#D1FAE5' : '#FEE2E2';
+                    document.getElementById(`b42-s-${i}`).style.backgroundColor = state.b42Ans.sColors[i];
+                }
+                
+                if(hintIdx !== null) {
+                    state.b42Ans.dColors[i] = (hintIdx === i) ? '#D1FAE5' : '#FEE2E2';
+                    document.getElementById(`b42-d-${i}`).style.backgroundColor = state.b42Ans.dColors[i];
+                }
+            });
+            saveState();
+        }
+
+        /* ================= БЛОК 6 ================= */
+        // Розділяємо масив підказок на дві частини
+        const ussLocsTop = [
+            { id: "lviv", name: "Місце формування Легіону Українських січових стрільців" },
+            { id: "stryi", name: "Прийняття присяги вояками легіону УСС перед відправкою на фронт" },
+            { id: "uzhok", name: "Перше зіткнення УСС 3 російськими кіннотниками" }
+        ];
+
+        const ussLocsBottom = [
+            { id: "makivka", name: "Запеклий бій, що зупинив просування росіян у Карпатах у 1915 році" },
+            { id: "lysonia", name: "Бій УСС на Тернопільщині, у яких вони понесли значні втрати" },
+            { id: "koniukhy", name: "Бій 1917 року, в якому багато усусів потрапили в російський полон" }
+        ];
+        
+        // Пісні перемішані не в хронологічному порядку
+        const audioData = [
+            { f: "juravli.mp3", id:"lysonia", desc: "1916, бій на горі Лисоня" },
+            { f: "chervona_kalina.mp3", id:"kalina", desc: "1914, гімн УСС" },
+            { f: "chi_to_grim.mp3", id:"dnipro", desc: "1918, похід на Ніддніпрянщину" },
+            { f: "hlopci_pidemo.mp3", id:"makiv", desc: "1915, бій на горі Маківка" },
+            { f: "tam_pri_dolini.mp3", id:"koniukhy", desc: "1917, бій під Конюхами" }
+        ];
+
+        const b52Options = [
+            "1914, гімн УСС",
+            "1915, бій на горі Маківка",
+            "1916, бій на горі Лисоня",
+            "1917, бій під Конюхами",
+            "1918, похід на Ніддніпрянщину"
+        ];
+        
+        let b51Sel = null; 
+        state.b51Ans = state.b51Ans || [];
+        state.b52Ans = state.b52Ans || []; 
+
+        function initB5() {
+            // Допоміжна функція для генерації HTML-коду однієї підказки
+            const createHintHTML = (l) => `<div id="b51-t-${l.id}" onclick="clickB51('${l.id}','text')" class="p-2 border rounded text-xs cursor-pointer hover:bg-gray-100 shadow-sm transition max-w-[250px] text-center" style="position: relative; z-index: 100; background-color: #ffffff;">${l.name}</div>`;
+            const topPool = document.getElementById('b51-text-pool-top');
+            if (topPool) topPool.innerHTML = ussLocsTop.map(createHintHTML).join('');
+            
+            const bottomPool = document.getElementById('b51-text-pool-bottom');
+            if (bottomPool) bottomPool.innerHTML = ussLocsBottom.map(createHintHTML).join('');
+
+            redrawB51();
+
+            // Ініціалізація 6.2 (Аудіо + Випадні списки)
+            document.getElementById('b52-audio-list').innerHTML = audioData.map((a, i) => {
+                let ans = state.b52Ans[i] || { val: '', c: '' };
+                let bgColor = (ans.c && ans.c !== '#243B53') ? ans.c : ''; 
+                
+                return `
+                <div class="flex flex-col md:flex-row items-center gap-4 p-3 border rounded bg-white shadow-sm">
+                    <audio controls class="w-full md:w-1/2 h-10"><source src="${a.f}" type="audio/mpeg"></audio>
+                    <select id="b52-s-${i}" onchange="changeB52(${i})" class="w-full md:w-1/2 p-2 border rounded text-sm font-medium outline-none cursor-pointer bg-white" style="background-color:${bgColor}">
+                        <option value="">-- Оберіть характеристику --</option>
+                        ${b52Options.map(opt => `<option ${ans.val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                </div>`;
+            }).join('');
+        }
+
+        // Логіка 6.1 (Лінії + можливість роз'єднати)
+        function clickB51(id, type) {
+            let existingLineIndex = state.b51Ans.findIndex(x => (type === 'text' && x.t === id) || (type === 'pin' && x.p === id));
+            
+            // Якщо натиснули на елемент із лінією і ми зараз НЕ в процесі створення нового зв'язку, видаляємо лінію
+            if (existingLineIndex > -1 && !b51Sel) {
+                state.b51Ans.splice(existingLineIndex, 1);
+                saveState(); 
+                redrawB51();
+                document.querySelectorAll('[id^="b51-t-"], [id^="m51-"]').forEach(el => el.classList.remove('outline', 'outline-4', 'outline-accent', 'ring-4', 'ring-accent'));
+                return; 
+            }
+
+            document.querySelectorAll('[id^="b51-t-"], [id^="m51-"]').forEach(el => el.classList.remove('outline', 'outline-4', 'outline-accent', 'ring-4', 'ring-accent'));
+            
+            if (!b51Sel) {
+                b51Sel = {id, type};
+                let el = document.getElementById(type==='text'?`b51-t-${id}`:`m51-${id}`);
+                if (type==='text') el.classList.add('outline', 'outline-4', 'outline-accent');
+                else el.classList.add('ring-4', 'ring-accent'); 
+            } else {
+                if (b51Sel.type !== type) {
+                    let textId = type==='text' ? id : b51Sel.id;
+                    let pinId = type==='pin' ? id : b51Sel.id;
+                    
+                    // Видаляємо старі лінії для цих елементів, щоб уникнути дублів
+                    state.b51Ans = state.b51Ans.filter(x => x.t !== textId && x.p !== pinId);
+                    
+                    state.b51Ans.push({t: textId, p: pinId, c: '#243B53'});
+                    saveState(); 
+                    redrawB51();
+                }
+                b51Sel = null;
+            }
+        }
+        
+        function redrawB51() {
+            document.getElementById('conn-svg-51').innerHTML = '';
+            
+            // Очищаємо стилі
+            document.querySelectorAll('[id^="b51-t-"]').forEach(el => {
+                el.style.borderColor = '';
+                el.style.borderWidth = '';
+                el.style.backgroundColor = '';
+            });
+            document.querySelectorAll('[id^="m51-"]').forEach(el => {
+                el.style.boxShadow = ''; 
+            });
+
+            // Малюємо лінії та виділяємо елементи
+            state.b51Ans.forEach(a => {
+                let lineColor = (a.c === '#10B981') ? '#008763' : a.c;
+                drawLine('conn-svg-51', `b51-t-${a.t}`, `m51-${a.p}`, lineColor);
+                
+                let textEl = document.getElementById(`b51-t-${a.t}`);
+                if (textEl) {
+                    textEl.style.borderColor = a.c;       
+                    textEl.style.borderWidth = '2px';     
+                    
+                    // Розділяємо кольори фону на 3 стани: правильно, неправильно і "в процесі"
+                    if (a.c === '#10B981') {
+                        textEl.style.backgroundColor = '#D1FAE5'; // Правильно (світло-зелений)
+                    } else if (a.c === '#8C3F4D') {
+                        textEl.style.backgroundColor = '#FDE8E8'; // Неправильно (світло-рожевий)
+                    } else {
+                        textEl.style.backgroundColor = '#E0F2FE'; // Щойно обрано (світло-блакитний)
+                    }
+                }
+
+                let pinEl = document.getElementById(`m51-${a.p}`);
+                if (pinEl) {
+                    pinEl.style.boxShadow = `0 0 0 4px ${a.c}66`; 
+                }
+            });
+        }
+        
+        function checkB51() {
+            state.b51Ans.forEach(a => { a.c = (a.t === a.p) ? '#10B981' : '#8C3F4D'; });
+            saveState(); 
+            redrawB51();
+        }
+        
+        // Логіка 6.2 (Випадні списки)
+        function changeB52(i) {
+            let el = document.getElementById(`b52-s-${i}`);
+            el.style.backgroundColor = '';
+            state.b52Ans[i] = { val: el.value, c: '' };
+            saveState();
+        }
+        
+        function checkB52() {
+            audioData.forEach((a, i) => {
+                let ans = state.b52Ans[i] || {};
+                if(ans.val) {
+                    ans.c = (ans.val === a.desc) ? '#D1FAE5' : '#FEE2E2';
+                    document.getElementById(`b52-s-${i}`).style.backgroundColor = ans.c;
+                }
+            });
+            saveState();
+        }
+
+        /* ================= БЛОК 7 ================= */
+const b6Questions = [
+    {
+        q: "1. Яке твердження про територіальні інтереси Росії, Австро-Угорщини та Німеччини на початку війни є правильним?",
+        opts: [
+            "Росія претендувала на Волинь і Галичину, Австро-Угорщина – на Схід України.",
+            "Німеччина претендувала на Поділля й Крим, Австро-Угорщина – на Галичину та Закарпаття.",
+            "Росія претендувала на Галичину й Буковину, Австро-Угорщина – на Волинь і Поділля.",
+            "Росія претендувала на Галичину та Поділля, Німеччина – на Буковину і Закарпаття."
+        ],
+        ans: 2
+    },
+    {
+        q: "2. Яку позицію щодо війни зайняла Головна українська рада?",
+        opts: [
+            "Підтримала Росію як державу, здатну об’єднати українські землі.",
+            "Підтримала Австро-Угорщину як противницю російського імперського панування.",
+            "Проголосила нейтралітет і закликала українців Росії та Австро-Угорщини уникати військової служби.",
+            "Підтримала Німеччину як державу, здатну створити незалежну Україну."
+        ],
+        ans: 1
+    },
+    {
+        q: "3. Яку мету в роки Першої світової війни проголошував Союз визволення України?",
+        opts: [
+            "Об’єднати українські землі навколо російського уряду та Державної думи.",
+            "Здобути автономію українських земель у складі Російської імперії.",
+            "Зберегти українські землі у складі Австро-Угорської монархії.",
+            "Домогтися створення самостійної української держави за підтримки Центральних держав."
+        ],
+        ans: 3
+    },
+    {
+        q: "4. Яка позиція ТУП найбільш точно характеризує його ставлення до війни?",
+        opts: [
+            "ТУП від самого початку безумовно підтримувало Центральні держави.",
+            "ТУП від самого початку безумовно підтримувало Російську імперію.",
+            "ТУП займало обережну нейтральну позицію, яка згодом стала критичнішою.",
+            "ТУП від самого початку вимагало негайного проголошення незалежної України."
+        ],
+        ans: 2
+    },
+    {
+        q: "5. Яке твердження найточніше характеризує позицію УСДРП під час війни?",
+        opts: [
+            "Партія повністю підтримала політику Австро-Угорщини щодо українських земель.",
+            "Частина діячів підтримала політику російського уряду, інші виступили проти війни.",
+            "Частина діячів повністю підтримала політику російського уряду та його військові дії, інші - австрійського.",
+            "Партія одностайно приєдналася до Союзу визволення України у Відні."
+        ],
+        ans: 1
+    },
+    {
+        q: "6. Хто з українських діячів був першим командантом Легіону Українських січових стрільців?",
+        opts: ["Василь Вишиваний", "Михайло Галущинський", "Кирило Трильовський", "Юліан Романчук"],
+        ans: 1
+    },
+    {
+        q: "7. Оберіть правильний варіант продовження твердження: Легіон Українських січових стрільців — це військова частина, створена за ініціативи…",
+        opts: [
+            "Союзу визволення України у складі німецької армії, що діяла проти румунської армії у 1914-1916 рр.",
+            "Головної української ради у складі австрійської армії, що діяла проти російської армії у 1914-1918 рр.",
+            "Карпато-руського визвольного комітету у складі російської армії, що діяла проти австрійської армії у 1915-1917 рр.",
+            "Товариства українських поступовців, що діяла як проти російської, так і проти німецької армій у 1916-1918 рр."
+        ],
+        ans: 1
+    },
+    {
+        q: "8. Яка з наведених характеристик стосується Андрія Жука?",
+        opts: [
+            "учасник боїв за гору Маківка, командир Галицько-Буковинського куреня січових стрільців",
+            "член ГУР, ЗУР, співзасновник СВУ, дипломат, історик",
+            "полковник Українських січових стрільців, австрійський архікнязь",
+            "голова СВУ, теоретик та ідеолог українського націоналізму"
+        ],
+        ans: 1
+    },
+    {
+        q: "9. Яка послідовність військових подій правильно відображає розвиток бойових дій на українських землях?",
+        opts: [
+            "Брусиловський прорив → Галицька битва → Горлицький прорив → Карпатська операція.",
+            "Галицька битва → Карпатська операція → Горлицький прорив → Брусиловський прорив.",
+            "Карпатська операція → Галицька битва → Брусиловський прорив → Горлицький прорив.",
+            "Галицька битва → Горлицький прорив → Брусиловський прорив → Карпатська операція."
+        ],
+        ans: 1
+    },
+    {
+        q: "10. Під час Першої світової війни львівська газета «Діло» писала: «Маківка — це перший крок на тому шляху, по якім українська нація зі стану пасивності переходила до стану активності… Битва на Маківці — це перша велика спроба галицьких українців стати самим активним чинником історії, творцями своєї будучини». У якому варіанті правильно визначено рік події та її результат?",
+        opts: [
+            "1915 р. — російські війська захопили гору й відкрили шлях через Карпати до Угорщини.",
+            "1915 р. — опір УСС виснажив російські війська й не дав їм розвинути наступ через Карпати.",
+            "1916 р. — австро-угорські війська відбили гору й змусили росіян залишити Східну Галичину.",
+            "1916 р. — УСС зупинили російський наступ і перейшли до контрнаступу в районі Карпат."
+        ],
+        ans: 1
+    },
+    {
+        q: "11. В якому році Загальна українська рада оприлюднила звернення з таким закликом? «За всяку ціну завзялася російська імперія загарбати українські землі Австро-Угорщини...Уже другий раз у часи цієї війни насувається на українські землі Австро-Угорщини російський наступ. Другий раз українське населення Галичини, Буковини й північно-східної Угорщини попадає в огонь національного й релігійного переслідування з боку Росії.»",
+        opts: ["1914 р.", "1915 р.", "1916 р.", "1917 р."],
+        ans: 2
+    }
+];
+
+const b6MatrixSources = [
+    { id: 1, t: "«Українці не піддадуться на провокації і виконають свій обов'язок громадян Росії в цей тяжкий час до кінця не тільки на полі бою, у шеренгах війська, а й як громадяни...»" },
+    { id: 2, t: "«Це справжня трагедія живого народу... Україна віддала своїх дітей у жертву кривавому богові війни. Цю війну ми визнаємо чужою для себе справою...»" },
+    { id: 3, t: "«Ненаситність царської імперії загрожує нашому національному життю.., яке знайшло захист у конституційному ладі австрійської держави...»" },
+    { id: 4, t: "«Реалізацію національно-політичних устремлінь українського народу пов'язуємо з розбиттям Росії у війні. Національно-політичною платформою є державна самостійність...»" }
+];
+
+const b6MatrixTargets = [
+    { id: 'А', t: "Українська соціал-демократична робітнича партія (УСДРП) на чолі з С. Петлюрою" },
+    { id: 'Б', t: "Союз визволення України (СВУ), очолюваний А. Жуком, Д. Донцовим, В. Дорошенком" },
+    { id: 'В', t: "Товариство українських поступовців (ТУП), очолюване М. Грушевським та Є. Чикаленком" },
+    { id: 'Г', t: "Головна українська рада (ГУР) на чолі з К. Левицьким" },
+    { id: 'Д', t: "Карпато-руський визвольний комітет (КРВК) на чолі з Ю. Яворським" }
+];
+
+const b6MatrixAnswers = { 1: 'А', 2: 'В', 3: 'Г', 4: 'Б' };
+
+// Ініціалізація стану Блоку 7
+state.b6 = state.b6 || {
+    q: Array(11).fill(null).map(() => ({ attempts: 0, points: 0, firstTryPoints: 0, passed: false })),
+    matrix: {
+        1: { attempts: 0, points: 0, firstTryPoints: 0, passed: false },
+        2: { attempts: 0, points: 0, firstTryPoints: 0, passed: false },
+        3: { attempts: 0, points: 0, firstTryPoints: 0, passed: false },
+        4: { attempts: 0, points: 0, firstTryPoints: 0, passed: false }
+    }
+};
+
+function initB6() {
+    // 1. Генерація 11 тестових питань
+    const qContainer = document.getElementById('b6-questions-container');
+    if(qContainer) {
+        qContainer.innerHTML = b6Questions.map((item, idx) => `
+            <div id="b6-q-container-${idx}" class="bg-white p-4 rounded border border-gray-300 shadow-sm transition-colors duration-300">
+                <p class="font-bold mb-3">${item.q}</p>
+                <div class="space-y-2">
+                    ${item.opts.map((opt, optIdx) => `
+                        <label class="flex items-start gap-2 cursor-pointer">
+                            <input type="radio" name="b6-q-${idx}" value="${optIdx}" onchange="resetB6Q(${idx})" class="mt-1 w-4 h-4 cursor-pointer">
+                            <span class="text-sm leading-tight">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="mt-4 flex items-center gap-4">
+                    <button id="b6-btn-${idx}" type="button" onclick="checkB6Q(${idx})" class="bg-primary text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-[#334e68] shadow">Відповісти</button>
+                    <span id="b6-q-feedback-${idx}"></span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 2. Генерація Матриці (виправлено накладання тексту)
+    const mContainer = document.getElementById('b6-matrix-content');
+    if(mContainer) {
+        let mHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm mb-6">';
+        mHtml += '<div><h4 class="font-bold mb-3 border-b pb-1">Джерела:</h4><div class="space-y-3">';
+        b6MatrixSources.forEach(s => mHtml += `<div class="flex items-start gap-2"><span class="shrink-0 bg-[#f97316] text-white rounded-full w-6 h-6 flex items-center justify-center font-bold">${s.id}</span> <span class="leading-snug">${s.t}</span></div>`);
+        mHtml += '</div></div><div><h4 class="font-bold mb-3 border-b pb-1">Політичні сили:</h4><div class="space-y-3">';
+        b6MatrixTargets.forEach(t => mHtml += `<div class="flex items-start gap-2"><span class="shrink-0 bg-[#f97316] text-white rounded w-6 h-6 flex items-center justify-center font-bold">${t.id}</span> <span class="leading-snug">${t.t}</span></div>`);
+        mHtml += '</div></div></div>';
+
+        mHtml += `<div class="overflow-x-auto mt-4 pb-2">
+            <p class="font-bold mb-2 text-sm">Позначте відповіді:</p>
+            <table class="border-collapse">
+                <thead>
+                    <tr>
+                        <!-- Прибрали w-12, щоб колонка могла розширюватися для тексту -->
+                        <th class="p-2 border-b"></th> 
+                        ${['А','Б','В','Г','Д'].map(l => `<th class="p-2 w-12 border-b text-center font-bold">${l}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>`;
+        for(let i=1; i<=4; i++) {
+            mHtml += `<tr id="b6-m-row-container-${i}" class="transition-colors duration-300 border-b border-gray-100">
+                <td class="p-2 h-[50px]">
+                    <!-- Додали min-w-[120px] та прибрали absolute, щоб текст посунув інші колонки, а не наліз на них -->
+                    <div class="flex items-center gap-2 min-w-[120px]">
+                        <span class="inline-flex shrink-0 bg-[#f97316] text-white rounded-full w-6 h-6 items-center justify-center font-bold">${i}</span>
+                        <span id="b6-m-feedback-${i}" class="text-xs whitespace-nowrap"></span>
+                    </div>
+                </td>`;
+            ['А','Б','В','Г','Д'].forEach(l => {
+                mHtml += `<td class="p-2 text-center align-middle h-[50px]">
+                    <input type="radio" name="b6-m-row-${i}" value="${l}" onchange="resetB6Matrix(${i})" class="w-5 h-5 accent-[#f97316] cursor-pointer block mx-auto">
+                </td>`;
+            });
+            mHtml += `</tr>`;
+        }
+        mHtml += `</tbody></table></div>`;
+        mContainer.innerHTML = mHtml;
+    }
+}
+
+// Функції очищення червоної підсвітки при зміні вибору
+function resetB6Q(idx) {
+    let qState = state.b6.q[idx];
+    if (qState.passed || qState.attempts >= 2) return;
+    let container = document.getElementById(`b6-q-container-${idx}`);
+    let feedback = document.getElementById(`b6-q-feedback-${idx}`);
+    container.classList.remove('bg-[#f8d7da]', 'border-[#dc3545]');
+    container.classList.add('bg-white', 'border-gray-300');
+    feedback.innerHTML = '';
+}
+
+function resetB6Matrix(i) {
+    let rowState = state.b6.matrix[i];
+    if (rowState.passed || rowState.attempts >= 2) return;
+    let rowEl = document.getElementById(`b6-m-row-container-${i}`);
+    let feedbackEl = document.getElementById(`b6-m-feedback-${i}`);
+    rowEl.classList.remove('bg-[#f8d7da]');
+    rowEl.classList.add('bg-white');
+    feedbackEl.innerHTML = '';
+}
+
+// Логіка перевірки тестових завдань
+function checkB6Q(idx) {
+    let qState = state.b6.q[idx];
+    if (qState.passed || qState.attempts >= 2) return;
+    
+    let selected = document.querySelector(`input[name="b6-q-${idx}"]:checked`);
+    if (!selected) return alert("Будь ласка, оберіть варіант відповіді перед перевіркою.");
+    
+    let ansVal = parseInt(selected.value);
+    qState.val = ansVal; // Запам'ятовуємо вибір
+    
+    let container = document.getElementById(`b6-q-container-${idx}`);
+    let feedback = document.getElementById(`b6-q-feedback-${idx}`);
+    
+    if (ansVal === b6Questions[idx].ans) {
+        container.classList.remove('bg-white', 'border-gray-300', 'bg-[#f8d7da]', 'border-[#dc3545]');
+        container.classList.add('bg-[#d1e7dd]', 'border-[#198754]');
+        qState.passed = true;
+        qState.points = 1;
+        if (qState.attempts === 0) qState.firstTryPoints = 1;
+        
+        feedback.innerHTML = '<span class="text-[#047857] font-bold">✅ Правильно</span>';
+        document.querySelectorAll(`input[name="b6-q-${idx}"]`).forEach(r => r.disabled = true);
+        document.getElementById(`b6-btn-${idx}`).style.display = 'none';
+    } else {
+        qState.attempts++;
+        container.classList.remove('bg-white', 'border-gray-300');
+        container.classList.add('bg-[#f8d7da]', 'border-[#dc3545]');
+        
+        if (qState.attempts === 1) {
+            feedback.innerHTML = '<span class="text-[#dc3545] font-bold">Спробуй ще!</span>';
+        } else {
+            feedback.innerHTML = '<span class="text-[#dc3545] font-bold">❌ Спроби вичерпано</span>';
+            document.querySelectorAll(`input[name="b6-q-${idx}"]`).forEach(r => r.disabled = true);
+            document.getElementById(`b6-btn-${idx}`).style.display = 'none';
+            let correctLabel = document.querySelector(`input[name="b6-q-${idx}"][value="${b6Questions[idx].ans}"]`);
+            if(correctLabel && correctLabel.nextElementSibling) {
+                correctLabel.nextElementSibling.classList.add('text-[#047857]', 'font-bold');
+                correctLabel.nextElementSibling.innerHTML += ' (✅ Правильна відповідь)';
+            }
+        }
+    }
+    saveState(); // Зберігаємо прогрес!
+}
+//Логіка перевірки матриці
+function checkB6Matrix() {
+    let stateChanged = false;
+    for(let i=1; i<=4; i++) {
+        let rowState = state.b6.matrix[i];
+        if(rowState.passed || rowState.attempts >= 2) continue;
+        
+        let selected = document.querySelector(`input[name="b6-m-row-${i}"]:checked`);
+        if(!selected) continue; 
+        
+        let val = selected.value;
+        rowState.val = val; // Запам'ятовуємо вибір
+        stateChanged = true;
+        
+        let rowEl = document.getElementById(`b6-m-row-container-${i}`);
+        let feedbackEl = document.getElementById(`b6-m-feedback-${i}`);
+        
+        if(val === b6MatrixAnswers[i]) {
+            rowEl.classList.remove('bg-white', 'bg-[#f8d7da]');
+            rowEl.classList.add('bg-[#d1e7dd]');
+            rowState.passed = true;
+            rowState.points = 1;
+            if(rowState.attempts === 0) rowState.firstTryPoints = 1;
+            document.querySelectorAll(`input[name="b6-m-row-${i}"]`).forEach(r => r.disabled = true);
+            feedbackEl.innerHTML = '<span class="text-[#047857] font-bold">✅</span>';
+        } else {
+            rowState.attempts++;
+            rowEl.classList.remove('bg-white');
+            rowEl.classList.add('bg-[#f8d7da]');
+            if(rowState.attempts === 1) {
+                feedbackEl.innerHTML = '<span class="text-[#dc3545] font-bold">Спробуй ще!</span>';
+            } else {
+                feedbackEl.innerHTML = `<span class="text-[#dc3545] font-bold">❌</span> <span class="text-[#047857] font-bold text-xs ml-1">Відповідь: ${b6MatrixAnswers[i]}</span>`;
+                document.querySelectorAll(`input[name="b6-m-row-${i}"]`).forEach(r => r.disabled = true);
+            }
+        }
+    }
+    if(stateChanged) saveState(); // Зберігаємо прогрес!
+}
+
+// Підрахунок і виведення результату
+function calculateB6Results(isRestoring = false) {
+    let totalPoints = 0;
+    let firstTryPoints = 0;
+    
+    state.b6.q.forEach(q => {
+        totalPoints += q.points;
+        firstTryPoints += q.firstTryPoints;
+    });
+    
+    for(let i=1; i<=4; i++) {
+        totalPoints += state.b6.matrix[i].points;
+        firstTryPoints += state.b6.matrix[i].firstTryPoints;
+    }
+    
+    let percent = Math.round((firstTryPoints / 15) * 100);
+    
+    // Приховуємо кнопку
+    let finishBtn = document.getElementById('b6-finish-btn');
+    if (finishBtn) finishBtn.style.display = 'none';
+
+    let resContainer = document.getElementById('b6-results-display');
+    resContainer.innerHTML = `
+        <div class="text-xl mb-3 text-center font-bold text-primary">Ваш результат:</div>
+        <ul class="text-lg space-y-2 mb-4">
+            <li>✅ Загальний бал: <strong>${totalPoints} з 15</strong></li>
+            <li>🎯 Правильних з 1-ї спроби: <strong>${firstTryPoints}</strong></li>
+        </ul>
+        <div class="text-2xl text-center text-[#047857] font-black border-t pt-3">
+            Успішність: ${percent}%
+        </div>
+    `;
+    resContainer.classList.remove('hidden');
+
+    if (!isRestoring) {
+        state.b6.finished = true;
+        saveState(); 
+    }
+}
+
+// Відновлення візуалу Блоку 7 після перезавантаження сторінки
+function restoreB6() {
+    if(!state.b6) return;
+    
+    state.b6.q.forEach((qState, idx) => {
+        if (qState.attempts > 0 || qState.passed) {
+            let container = document.getElementById(`b6-q-container-${idx}`);
+            let feedback = document.getElementById(`b6-q-feedback-${idx}`);
+            let btn = document.getElementById(`b6-btn-${idx}`);
+            
+            // Відновлюємо обрану радіокнопку
+            if (qState.val !== undefined && qState.val !== null) {
+                let radio = document.querySelector(`input[name="b6-q-${idx}"][value="${qState.val}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            // Відновлюємо кольори
+            if (qState.passed) {
+                container.classList.remove('bg-white', 'border-gray-300', 'bg-[#f8d7da]', 'border-[#dc3545]');
+                container.classList.add('bg-[#d1e7dd]', 'border-[#198754]');
+                feedback.innerHTML = '<span class="text-[#047857] font-bold">✅ Правильно</span>';
+                document.querySelectorAll(`input[name="b6-q-${idx}"]`).forEach(r => r.disabled = true);
+                if (btn) btn.style.display = 'none';
+            } else if (qState.attempts >= 2) {
+                container.classList.remove('bg-white', 'border-gray-300');
+                container.classList.add('bg-[#f8d7da]', 'border-[#dc3545]');
+                feedback.innerHTML = '<span class="text-[#dc3545] font-bold">❌ Спроби вичерпано</span>';
+                document.querySelectorAll(`input[name="b6-q-${idx}"]`).forEach(r => r.disabled = true);
+                if (btn) btn.style.display = 'none';
+                let correctLabel = document.querySelector(`input[name="b6-q-${idx}"][value="${b6Questions[idx].ans}"]`);
+                if(correctLabel && correctLabel.nextElementSibling) {
+                    correctLabel.nextElementSibling.classList.add('text-[#047857]', 'font-bold');
+                    if(!correctLabel.nextElementSibling.innerHTML.includes('Правильна відповідь')) {
+                        correctLabel.nextElementSibling.innerHTML += ' (✅ Правильна відповідь)';
+                    }
+                }
+            } else if (qState.attempts === 1) {
+                container.classList.remove('bg-white', 'border-gray-300');
+                container.classList.add('bg-[#f8d7da]', 'border-[#dc3545]');
+                feedback.innerHTML = '<span class="text-[#dc3545] font-bold">Спробуй ще!</span>';
+            }
+        }
+    });
+
+    for(let i=1; i<=4; i++) {
+        let rowState = state.b6.matrix[i];
+        if (rowState.attempts > 0 || rowState.passed) {
+            let rowEl = document.getElementById(`b6-m-row-container-${i}`);
+            let feedbackEl = document.getElementById(`b6-m-feedback-${i}`);
+            
+            if (rowState.val) {
+                let radio = document.querySelector(`input[name="b6-m-row-${i}"][value="${rowState.val}"]`);
+                if (radio) radio.checked = true;
+            }
+            
+            if (rowState.passed) {
+                rowEl.classList.remove('bg-white', 'bg-[#f8d7da]');
+                rowEl.classList.add('bg-[#d1e7dd]');
+                document.querySelectorAll(`input[name="b6-m-row-${i}"]`).forEach(r => r.disabled = true);
+                feedbackEl.innerHTML = '<span class="text-[#047857] font-bold">✅</span>';
+            } else if (rowState.attempts >= 2) {
+                rowEl.classList.remove('bg-white');
+                rowEl.classList.add('bg-[#f8d7da]');
+                feedbackEl.innerHTML = `<span class="text-[#dc3545] font-bold">❌</span> <span class="text-[#047857] font-bold text-xs ml-1">Відповідь: ${b6MatrixAnswers[i]}</span>`;
+                document.querySelectorAll(`input[name="b6-m-row-${i}"]`).forEach(r => r.disabled = true);
+            } else if (rowState.attempts === 1) {
+                rowEl.classList.remove('bg-white');
+                rowEl.classList.add('bg-[#f8d7da]');
+                feedbackEl.innerHTML = '<span class="text-[#dc3545] font-bold">Спробуй ще!</span>';
+            }
+        }
+    }
+    
+    if (state.b6.finished) calculateB6Results(true);
+}
+
+// Завантаження стану при старті
+function loadState() {
+    if(state.activeTab) switchTab(state.activeTab);
+    
+    // Перемальовуємо лінії та відновлюємо кольори із затримкою
+    setTimeout(() => {
+        if(typeof redrawB1 === 'function') redrawB1();
+        if(typeof redrawB51 === 'function') redrawB51();
+        if(typeof restoreB6 === 'function') restoreB6();
+    }, 150);
+}
+
+// Завантаження стану при старті
+function loadState() {
+    if(state.activeTab) switchTab(state.activeTab);
+    
+    // Перемальовуємо лінії та відновлюємо кольори із затримкою
+    setTimeout(() => {
+        if(typeof redrawB1 === 'function') redrawB1();
+        if(typeof redrawB51 === 'function') redrawB51();
+        if(typeof restoreB6 === 'function') restoreB6();
+    }, 150);
+}
+
+// ВИПРАВЛЕННЯ: Запускаємо код одразу після читання HTML, не чекаючи завантаження відео/картинок
+document.addEventListener('DOMContentLoaded', () => {
+    initB1(); initB2(); initB3(); initB41(); initB42(); initB5(); 
+    if(typeof initB6 === 'function') initB6();
+    loadState(); 
+});
+</script>
+
+<footer class="bg-primary text-paper py-4 mt-8 text-center text-sm border-t border-[#334e68] z-50">
+    Інтерактив створений Ольгою Герінбург
+</footer>
+
+</body>
+</html>
